@@ -493,6 +493,7 @@
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.35);
+      position: relative;
     }
 
     .videoWrap iframe{
@@ -501,6 +502,21 @@
       display:block;
       border:0;
       background:#000;
+    }
+
+    .videoPlaceholder{
+      width:100%;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:16px;
+      color: rgba(232,237,245,.74);
+      font-size:13px;
+      text-align:center;
+      line-height:1.45;
+      background:
+        radial-gradient(400px 280px at 50% 35%, rgba(122,162,255,.12), transparent 65%),
+        rgba(0,0,0,.28);
     }
 
     .videoNote{
@@ -783,17 +799,12 @@ Y elegí ir a verte</p>
         <!-- SCENE 5 -->
         <section class="scene" id="scene5" aria-label="Video">
           <div class="content fadeIn videoStage">
-            <div class="videoWrap">
-              <iframe
-                src="https://www.youtube.com/embed/WuGrrLOx5zY?autoplay=1&mute=1&controls=0&loop=1&playlist=WuGrrLOx5zY&playsinline=1&rel=0&modestbranding=1"
-                title="Video"
-                frameborder="0"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin">
-              </iframe>
+            <div class="videoWrap" id="videoWrap">
+              <div class="videoPlaceholder">
+                Preparando video…
+              </div>
             </div>
-            <p class="videoNote">El video debería reproducirse automáticamente.</p>
+            <p class="videoNote">El video se carga recién al entrar a esta pantalla.</p>
           </div>
 
           <div class="footer">
@@ -868,6 +879,7 @@ Y nos volvimos a encontrar.</p>
     const ACCESS_PASSWORD = "MAURILU";
     const SHORT_NAME = "Lu";
     const DEFAULT_TONE = "claro";
+    const YT_VIDEO_ID = "WuGrrLOx5zY";
 
     const toneLabel = {
       claro: "Claro",
@@ -963,6 +975,7 @@ Y nos volvimos a encontrar.</p>
     const loadingPercent = document.getElementById("loadingPercent");
     const loadingState = document.getElementById("loadingState");
 
+    const videoWrap = document.getElementById("videoWrap");
     const finalList = document.getElementById("finalList");
 
     const toneOverlay = document.getElementById("toneOverlay");
@@ -1130,11 +1143,40 @@ Y nos volvimos a encontrar.</p>
       }, qTime));
     }
 
+    function mountVideo(){
+      if(!videoWrap) return;
+      if(videoWrap.querySelector("iframe")) return;
+
+      videoWrap.innerHTML = `
+        <iframe
+          src="https://www.youtube.com/embed/${YT_VIDEO_ID}?autoplay=1&mute=1&controls=1&loop=1&playlist=${YT_VIDEO_ID}&playsinline=1&rel=0&modestbranding=1"
+          title="Video"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+      `;
+    }
+
+    function unmountVideo(){
+      if(!videoWrap) return;
+      videoWrap.innerHTML = `
+        <div class="videoPlaceholder">
+          Preparando video…
+        </div>
+      `;
+    }
+
     function showScene(index){
       clearLoadingTimers();
       current = index;
 
       const sceneId = scenes[index];
+
+      if(sceneId !== "scene5"){
+        unmountVideo();
+      }
 
       scenes.forEach((id,i)=>{
         const el = document.getElementById(id);
@@ -1154,6 +1196,10 @@ Y nos volvimos a encontrar.</p>
         setBackground(BG.juntos);
       }else{
         setBackground(null);
+      }
+
+      if(sceneId === "scene5"){
+        mountVideo();
       }
 
       if(sceneId === "scene8"){
@@ -1232,7 +1278,7 @@ Y nos volvimos a encontrar.</p>
     document.getElementById("btnTo5").addEventListener("click", ()=> showScene(6));
     document.getElementById("btnTo6").addEventListener("click", ()=> showScene(7));
     document.getElementById("btnTo7").addEventListener("click", ()=> showScene(8));
-    document.getElementById("btnTo8").addEventListener("click", ()=> showScene(9));
+    document.getElementById("btnTo8").addEventListener("click", ()=> showScene(8));
 
     backBtn.addEventListener("click", goBack);
     toneBtn.addEventListener("click", openToneOverlay);
