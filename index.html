@@ -1,418 +1,104 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Experiencia</title>
-  <style>
-    :root{
-      --bg:#0b0b0f;
-      --card:#16161d;
-      --text:#f4f4f6;
-      --muted:#a7a7b3;
-      --accent:#ffffff;
-      --line:rgba(255,255,255,.1);
-    }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🔒</title>
 
-    *{box-sizing:border-box}
+<style>
+body{margin:0;background:#0b0f14;color:#fff;font-family:system-ui;}
+.stage{height:100vh;display:flex;flex-direction:column}
+.scene{display:none;height:100%}
+.scene.active{display:flex;flex-direction:column;justify-content:center;align-items:center}
 
-    html,body{
-      margin:0;
-      padding:0;
-      width:100%;
-      min-height:100%;
-      background:var(--bg);
-      color:var(--text);
-      font-family:Arial, Helvetica, sans-serif;
-      overflow-x:hidden;
-    }
+.videoWrap{
+  width:90vw;
+  max-width:420px;
+  aspect-ratio:9/16;
+  border-radius:16px;
+  overflow:hidden;
+  background:#000;
+}
 
-    body{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
+.videoWrap iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
 
-    .screen{
-      display:none;
-      width:100%;
-      min-height:100vh;
-      padding:24px;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .screen.active{
-      display:flex;
-    }
-
-    .card{
-      width:100%;
-      max-width:720px;
-      background:rgba(22,22,29,.88);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:28px;
-      text-align:center;
-      box-shadow:0 10px 40px rgba(0,0,0,.35);
-      backdrop-filter:blur(8px);
-    }
-
-    h1,h2,p{
-      margin:0;
-    }
-
-    h1{
-      font-size:clamp(26px,4vw,40px);
-      margin-bottom:12px;
-      letter-spacing:.02em;
-    }
-
-    h2{
-      font-size:clamp(22px,3.2vw,32px);
-      margin-bottom:12px;
-    }
-
-    p{
-      color:var(--muted);
-      line-height:1.55;
-      font-size:clamp(15px,2.3vw,17px);
-    }
-
-    .spacer{height:18px}
-    .spacer-lg{height:28px}
-
-    button{
-      appearance:none;
-      border:none;
-      border-radius:999px;
-      padding:14px 22px;
-      background:#fff;
-      color:#111;
-      font-weight:700;
-      font-size:15px;
-      cursor:pointer;
-      transition:transform .15s ease, opacity .15s ease;
-    }
-
-    button:hover{transform:translateY(-1px)}
-    button:active{transform:translateY(0)}
-    button.secondary{
-      background:transparent;
-      color:#fff;
-      border:1px solid rgba(255,255,255,.18);
-    }
-
-    .btn-row{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-
-    input[type="password"]{
-      width:min(100%, 360px);
-      padding:14px 16px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.05);
-      color:#fff;
-      outline:none;
-      font-size:16px;
-      text-align:center;
-    }
-
-    .error{
-      color:#ff9f9f;
-      font-size:14px;
-      margin-top:12px;
-      min-height:18px;
-    }
-
-    .progress-wrap{
-      width:min(100%, 460px);
-      margin:0 auto;
-      text-align:left;
-    }
-
-    .progress-label{
-      color:#fff;
-      font-size:14px;
-      margin-bottom:10px;
-      min-height:20px;
-    }
-
-    .progress-bar{
-      width:100%;
-      height:12px;
-      background:rgba(255,255,255,.08);
-      border-radius:999px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-    }
-
-    .progress-fill{
-      width:0%;
-      height:100%;
-      background:#fff;
-      border-radius:999px;
-      transition:width .25s linear;
-    }
-
-    .tiny{
-      margin-top:12px;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .video-shell{
-      width:100%;
-      max-width:950px;
-      margin:0 auto;
-    }
-
-    .video-frame{
-      position:relative;
-      width:100%;
-      padding-top:56.25%;
-      border-radius:18px;
-      overflow:hidden;
-      background:#000;
-      border:1px solid rgba(255,255,255,.1);
-    }
-
-    .video-frame iframe{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      border:0;
-    }
-
-    .note{
-      margin-top:14px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .fade-in{
-      animation:fadeIn .45s ease both;
-    }
-
-    @keyframes fadeIn{
-      from{opacity:0;transform:translateY(8px)}
-      to{opacity:1;transform:translateY(0)}
-    }
-
-    @media (max-width:640px){
-      .card{
-        padding:22px 18px;
-        border-radius:18px;
-      }
-      button{
-        width:100%;
-      }
-      .btn-row{
-        flex-direction:column;
-      }
-    }
-  </style>
+button{
+  margin-top:20px;
+  padding:12px 16px;
+  border-radius:10px;
+  border:none;
+  background:#7aa2ff;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-  <!-- PANTALLA 1 -->
-  <section id="screen-welcome" class="screen active">
-    <div class="card fade-in">
-      <h1>Bienvenida</h1>
-      <p>
-        Hay algo preparado para vos.<br>
-        No hace falta apurarse.
-      </p>
-      <div class="spacer-lg"></div>
-      <div class="btn-row">
-        <button id="startBtn">Comenzar</button>
+<div class="stage">
+
+  <!-- SCENE 1 -->
+  <div class="scene active" id="scene1">
+    <h2>Continuar</h2>
+    <button onclick="goToVideo()">Ir al video</button>
+  </div>
+
+  <!-- SCENE VIDEO -->
+  <div class="scene" id="sceneVideo">
+    <div class="videoWrap" id="videoWrap">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%">
+        Cargando video...
       </div>
     </div>
-  </section>
 
-  <!-- PANTALLA 2 -->
-  <section id="screen-password" class="screen">
-    <div class="card fade-in">
-      <h2>Ingresá la contraseña</h2>
-      <p>
-        La experiencia se abre solo con la clave correcta.
-      </p>
-      <div class="spacer-lg"></div>
-      <input id="passwordInput" type="password" placeholder="Contraseña" />
-      <div class="spacer"></div>
-      <div class="btn-row">
-        <button id="passwordBtn">Continuar</button>
-        <button class="secondary" id="backToWelcomeBtn">Volver</button>
-      </div>
-      <div id="passwordError" class="error"></div>
+    <button onclick="back()">Volver</button>
+  </div>
+
+</div>
+
+<script>
+const videoId = "1175649210";
+const videoWrap = document.getElementById("videoWrap");
+
+function mountVideo(){
+  if(videoWrap.querySelector("iframe")) return;
+
+  videoWrap.innerHTML = `
+    <iframe
+      src="https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&playsinline=1&title=0&byline=0&portrait=0&dnt=1"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+  `;
+}
+
+function unmountVideo(){
+  videoWrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100%">
+      Cargando video...
     </div>
-  </section>
+  `;
+}
 
-  <!-- PANTALLA 3 -->
-  <section id="screen-loading" class="screen">
-    <div class="card fade-in">
-      <h2>Preparando experiencia</h2>
-      <p>
-        Esto no está cargando nada importante. Solo estamos siendo dramáticos.
-      </p>
-      <div class="spacer-lg"></div>
+function goToVideo(){
+  document.getElementById("scene1").classList.remove("active");
+  document.getElementById("sceneVideo").classList.add("active");
+  mountVideo();
+}
 
-      <div class="progress-wrap">
-        <div id="progressLabel" class="progress-label">Initializing emotional interface… 0%</div>
-        <div class="progress-bar">
-          <div id="progressFill" class="progress-fill"></div>
-        </div>
-        <div class="tiny">UX mode: suspiciously polished</div>
-      </div>
-    </div>
-  </section>
+function back(){
+  document.getElementById("sceneVideo").classList.remove("active");
+  document.getElementById("scene1").classList.add("active");
+  unmountVideo();
+}
+</script>
 
-  <!-- PANTALLA 4 -->
-  <section id="screen-final" class="screen">
-    <div class="card fade-in">
-      <h2>Ya está</h2>
-      <p>
-        Ahora sí.
-      </p>
-      <div class="spacer-lg"></div>
-      <div class="btn-row">
-        <button id="showVideoBtn">Ver video</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PANTALLA 5 -->
-  <section id="screen-video" class="screen">
-    <div class="video-shell fade-in">
-      <div class="video-frame" id="videoContainer"></div>
-      <div class="note">
-        Si Vimeo llegara a pedir login, el problema ya no es este HTML sino la privacidad/embed del video en Vimeo.
-      </div>
-    </div>
-  </section>
-
-  <script>
-    const PASSWORD = "1234"; 
-    // CAMBIÁ ESTO por la contraseña real que quieras
-
-    const screens = {
-      welcome: document.getElementById("screen-welcome"),
-      password: document.getElementById("screen-password"),
-      loading: document.getElementById("screen-loading"),
-      final: document.getElementById("screen-final"),
-      video: document.getElementById("screen-video")
-    };
-
-    const startBtn = document.getElementById("startBtn");
-    const passwordBtn = document.getElementById("passwordBtn");
-    const backToWelcomeBtn = document.getElementById("backToWelcomeBtn");
-    const passwordInput = document.getElementById("passwordInput");
-    const passwordError = document.getElementById("passwordError");
-
-    const progressFill = document.getElementById("progressFill");
-    const progressLabel = document.getElementById("progressLabel");
-
-    const showVideoBtn = document.getElementById("showVideoBtn");
-    const videoContainer = document.getElementById("videoContainer");
-
-    let videoInjected = false;
-
-    function showScreen(name){
-      Object.values(screens).forEach(s => s.classList.remove("active"));
-      screens[name].classList.add("active");
-      window.scrollTo(0, 0);
-    }
-
-    startBtn.addEventListener("click", () => {
-      passwordInput.value = "";
-      passwordError.textContent = "";
-      showScreen("password");
-      setTimeout(() => passwordInput.focus(), 100);
-    });
-
-    backToWelcomeBtn.addEventListener("click", () => {
-      showScreen("welcome");
-    });
-
-    passwordBtn.addEventListener("click", validatePassword);
-    passwordInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") validatePassword();
-    });
-
-    function validatePassword(){
-      if (passwordInput.value === PASSWORD){
-        passwordError.textContent = "";
-        showScreen("loading");
-        runFakeLoading();
-      } else {
-        passwordError.textContent = "Contraseña incorrecta.";
-      }
-    }
-
-    function runFakeLoading(){
-      const steps = [
-        "Initializing emotional interface…",
-        "Calibrating visual tension…",
-        "Loading candidate interface…",
-        "Aligning microinteractions…",
-        "Refining typography hierarchy…",
-        "Reducing unnecessary friction…",
-        "Injecting tasteful suspense…",
-        "Rendering delight state…",
-        "Final UX polish…"
-      ];
-
-      let progress = 0;
-      let stepIndex = 0;
-
-      progressFill.style.width = "0%";
-      progressLabel.textContent = steps[0] + " 0%";
-
-      const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 9) + 4;
-
-        if (progress > 100) progress = 100;
-
-        if (progress > (stepIndex + 1) * 11 && stepIndex < steps.length - 1){
-          stepIndex++;
-        }
-
-        progressFill.style.width = progress + "%";
-        progressLabel.textContent = steps[stepIndex] + " " + progress + "%";
-
-        if (progress >= 100){
-          clearInterval(interval);
-          setTimeout(() => {
-            showScreen("final");
-          }, 500);
-        }
-      }, 220);
-    }
-
-    showVideoBtn.addEventListener("click", () => {
-      showScreen("video");
-      injectVideo();
-    });
-
-    function injectVideo(){
-      if (videoInjected) return;
-
-      videoContainer.innerHTML = `
-        <iframe
-          src="https://player.vimeo.com/video/1175649210?autoplay=1&title=0&byline=0&portrait=0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-          referrerpolicy="strict-origin-when-cross-origin">
-        </iframe>
-      `;
-
-      videoInjected = true;
-    }
-  </script>
 </body>
 </html>
