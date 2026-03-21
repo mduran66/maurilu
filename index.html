@@ -848,11 +848,6 @@ Y nos volvimos a encontrar.</p>
               <div class="upperDivider"></div>
             </div>
           </div>
-
-          <div class="footer">
-            <span class="hint"></span>
-            <button class="btn primary" id="btnTo8">Continuar</button>
-          </div>
         </section>
 
         <!-- SCENE 8 -->
@@ -879,7 +874,7 @@ Y nos volvimos a encontrar.</p>
     const ACCESS_PASSWORD = "MAURILU";
     const SHORT_NAME = "Lu";
     const DEFAULT_TONE = "claro";
-    const YT_VIDEO_ID = "WuGrrLOx5zY";
+    const VIMEO_VIDEO_ID = "1175649210";
 
     const toneLabel = {
       claro: "Claro",
@@ -1149,7 +1144,7 @@ Y nos volvimos a encontrar.</p>
 
       videoWrap.innerHTML = `
         <iframe
-          src="https://www.youtube.com/embed/${YT_VIDEO_ID}?autoplay=1&mute=1&controls=1&loop=1&playlist=${YT_VIDEO_ID}&playsinline=1&rel=0&modestbranding=1"
+          src="https://player.vimeo.com/video/${VIMEO_VIDEO_ID}?autoplay=1&muted=1&playsinline=1&title=0&byline=0&portrait=0&dnt=1"
           title="Video"
           frameborder="0"
           allow="autoplay; fullscreen; picture-in-picture"
@@ -1180,7 +1175,7 @@ Y nos volvimos a encontrar.</p>
 
       scenes.forEach((id,i)=>{
         const el = document.getElementById(id);
-        el.classList.toggle("active", i === index);
+        if(el) el.classList.toggle("active", i === index);
       });
 
       setTopControlsForScene(sceneId);
@@ -1272,15 +1267,12 @@ Y nos volvimos a encontrar.</p>
     });
 
     document.getElementById("btnUnlock").addEventListener("click", tryUnlock);
-
-    /* CORREGIDO: índices reales */
-    document.getElementById("btnToLoad").addEventListener("click", ()=> showScene(2)); // sceneLoad
-    document.getElementById("btnTo3").addEventListener("click", ()=> showScene(4));   // no se usa porque scene2 llega desde loading
+    document.getElementById("btnToLoad").addEventListener("click", ()=> showScene(2));
+    document.getElementById("btnTo3").addEventListener("click", ()=> showScene(4));
     document.getElementById("btnTo4").addEventListener("click", ()=> showScene(5));
     document.getElementById("btnTo5").addEventListener("click", ()=> showScene(6));
     document.getElementById("btnTo6").addEventListener("click", ()=> showScene(7));
     document.getElementById("btnTo7").addEventListener("click", ()=> showScene(8));
-    document.getElementById("btnTo8").addEventListener("click", ()=> showScene(9));
 
     backBtn.addEventListener("click", goBack);
     toneBtn.addEventListener("click", openToneOverlay);
