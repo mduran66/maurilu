@@ -1,104 +1,1308 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>🔒</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>🔒</title>
 
-<style>
-body{margin:0;background:#0b0f14;color:#fff;font-family:system-ui;}
-.stage{height:100vh;display:flex;flex-direction:column}
-.scene{display:none;height:100%}
-.scene.active{display:flex;flex-direction:column;justify-content:center;align-items:center}
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --text:#e8edf5;
+      --muted:#a3afbc;
+      --border:rgba(255,255,255,.12);
+      --accent:#7aa2ff;
+      --danger:#ff7a7a;
 
-.videoWrap{
-  width:90vw;
-  max-width:420px;
-  aspect-ratio:9/16;
-  border-radius:16px;
-  overflow:hidden;
-  background:#000;
-}
+      --h: clamp(26px, 5.8vw, 36px);
+      --p: clamp(15px, 3.9vw, 18px);
+      --k: 12px;
+    }
 
-.videoWrap iframe{
-  width:100%;
-  height:100%;
-  border:0;
-}
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing:.1px;
+      overflow:hidden;
+    }
 
-button{
-  margin-top:20px;
-  padding:12px 16px;
-  border-radius:10px;
-  border:none;
-  background:#7aa2ff;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-</style>
+    .stage{
+      height: 100svh;
+      height: 100dvh;
+      width: 100%;
+      position: relative;
+      overflow:hidden;
+      background: var(--bg);
+    }
+
+    .bg{
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(1100px 800px at 20% 10%, rgba(122,162,255,.16), transparent 55%),
+        radial-gradient(900px 700px at 80% 90%, rgba(255,255,255,.06), transparent 60%),
+        var(--bg);
+    }
+
+    .bgImg{
+      position:absolute;
+      inset:0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.02);
+      filter: saturate(1.03) contrast(1.03);
+      display:none;
+    }
+
+    .shade{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.52) 60%, rgba(0,0,0,.72) 100%);
+      display:none;
+      pointer-events:none;
+    }
+
+    .safe{
+      position:absolute;
+      inset:0;
+      padding: 14px;
+    }
+
+    @supports (padding: max(0px)) {
+      .safe{
+        padding-left:  max(14px, env(safe-area-inset-left));
+        padding-right: max(14px, env(safe-area-inset-right));
+        padding-top:   max(14px, env(safe-area-inset-top));
+        padding-bottom:max(14px, env(safe-area-inset-bottom));
+      }
+    }
+
+    .panel{
+      position:relative;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      min-height: 34px;
+    }
+
+    .kickerTop{
+      margin:0;
+      font-size: var(--k);
+      color: rgba(232,237,245,.78);
+      letter-spacing:.2px;
+    }
+
+    .iconBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(232,237,245,.92);
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+      transition: transform .05s ease, background .18s ease, border-color .18s ease;
+      backdrop-filter: blur(6px);
+    }
+    .iconBtn:hover{ background: rgba(255,255,255,.08); }
+    .iconBtn:active{ transform: translateY(1px); }
+
+    .leftControls, .rightControls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 84px;
+    }
+    .rightControls{ justify-content:flex-end; }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap: 14px;
+      min-height:0;
+    }
+
+    .title{
+      margin:0;
+      font-size: var(--h);
+      font-weight: 800;
+      line-height: 1.10;
+      letter-spacing:.2px;
+      text-wrap: balance;
+    }
+
+    .sub{
+      margin:0;
+      font-size: var(--p);
+      line-height: 1.55;
+      color: rgba(232,237,245,.82);
+    }
+
+    .muted{ color: var(--muted); }
+
+    .footer{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .hint{
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(232,237,245,.72);
+      max-width: 62%;
+    }
+
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 780;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+      transition: transform .05s ease, background .18s ease, border-color .18s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ background: rgba(255,255,255,.10); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(122,162,255,.50);
+      background: rgba(122,162,255,.14);
+    }
+    .btn.primary:hover{ background: rgba(122,162,255,.22); }
+
+    .scene{ display:none; height:100%; }
+    .scene.active{ display:block; }
+
+    .authWrap{
+      width:min(560px, 100%);
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .authCard{
+      background: rgba(0,0,0,.26);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      padding: 18px;
+      backdrop-filter: blur(7px);
+    }
+
+    .authLabel{
+      display:block;
+      font-size: 13px;
+      color: rgba(232,237,245,.78);
+      margin-bottom: 10px;
+    }
+
+    .authInput{
+      width:100%;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding: 14px 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      outline:none;
+      transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .authInput::placeholder{
+      color: rgba(232,237,245,.38);
+    }
+
+    .authInput:focus{
+      border-color: rgba(122,162,255,.52);
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 0 0 3px rgba(122,162,255,.10);
+    }
+
+    .authError{
+      min-height: 20px;
+      margin: 10px 0 0 0;
+      font-size: 13px;
+      color: var(--danger);
+    }
+
+    .tones{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 6px;
+    }
+
+    .tone-btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 780;
+      font-size: 13px;
+      transition: background .18s ease, border-color .18s ease, transform .05s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tone-btn:hover{ background: rgba(255,255,255,.10); }
+    .tone-btn:active{ transform: translateY(1px); }
+    .tone-btn.active{
+      border-color: rgba(122,162,255,.55);
+      background: rgba(122,162,255,.12);
+    }
+
+    .preview{
+      margin-top: 10px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.16);
+      background: rgba(0,0,0,.20);
+      padding: 14px;
+    }
+
+    .previewTitle{
+      margin:0 0 10px 0;
+      color: rgba(232,237,245,.72);
+      font-size: 12px;
+      letter-spacing:.2px;
+    }
+
+    .bubble{
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px 14px;
+      line-height: 1.45;
+      font-size: 15px;
+      white-space:pre-line;
+    }
+
+    .chosen{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(232,237,245,.88);
+    }
+    .chosen span{ color: var(--muted); }
+
+    .fadeSwap{ opacity:1; transition: opacity 160ms ease; }
+    .fadeSwap.fading{ opacity:0; }
+
+    .loadingWrap{
+      width:min(560px, 100%);
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .loadingCard{
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      padding: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .loadingHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 14px;
+    }
+
+    .loadingLabel{
+      font-size: 13px;
+      color: rgba(232,237,245,.78);
+      letter-spacing:.2px;
+      margin:0;
+    }
+
+    .loadingPercent{
+      font-size: 13px;
+      color: rgba(232,237,245,.92);
+      font-weight: 800;
+      margin:0;
+      min-width: 44px;
+      text-align:right;
+    }
+
+    .progress{
+      width:100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .progressBar{
+      height:100%;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(122,162,255,.55), rgba(122,162,255,.95));
+      box-shadow: 0 0 18px rgba(122,162,255,.25);
+      transition: width 1200ms cubic-bezier(.22,1,.36,1);
+    }
+
+    .loadingState{
+      margin: 14px 0 0 0;
+      min-height: 48px;
+      font-size: clamp(16px, 4.2vw, 19px);
+      line-height: 1.45;
+      color: rgba(232,237,245,.92);
+      text-wrap: pretty;
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+
+    .loadingState.updating{
+      opacity:.35;
+      transform: translateY(2px);
+    }
+
+    .loadingHint{
+      margin:0;
+      font-size: 12px;
+      line-height: 1.4;
+      color: rgba(232,237,245,.64);
+    }
+
+    .statement{
+      font-size: clamp(28px, 6.8vw, 38px);
+      font-weight: 850;
+      line-height: 1.08;
+      letter-spacing:.2px;
+      text-wrap: balance;
+    }
+
+    .statementSub{
+      color: rgba(232,237,245,.78);
+      font-size: var(--p);
+      line-height: 1.55;
+      max-width: 34ch;
+    }
+
+    .divider{
+      margin-top: 6px;
+      height: 1px;
+      background: rgba(255,255,255,.10);
+      border-radius: 999px;
+      width: min(520px, 100%);
+    }
+
+    .centerNudge{
+      transform: translateY(10px);
+    }
+
+    .glass{
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 14px;
+      backdrop-filter: blur(7px);
+    }
+
+    .kickerIn{
+      margin:0 0 8px 0;
+      font-size: 12px;
+      color: rgba(232,237,245,.80);
+      letter-spacing:.2px;
+    }
+
+    .lines{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .line{
+      margin:0;
+      font-size: var(--p);
+      line-height: 1.55;
+      color: rgba(232,237,245,.92);
+      text-wrap: pretty;
+    }
+
+    .upperContent{
+      justify-content:flex-start;
+      padding-top: clamp(22px, 7vh, 60px);
+    }
+
+    .upperBlock{
+      width:min(620px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .upperText{
+      margin:0;
+      font-size: clamp(28px, 6.8vw, 40px);
+      font-weight: 850;
+      line-height: 1.12;
+      letter-spacing:.2px;
+      text-wrap: balance;
+      white-space: pre-line;
+      text-shadow: 0 2px 16px rgba(0,0,0,.28);
+    }
+
+    .upperDivider{
+      height: 1px;
+      width: min(520px, 100%);
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+    }
+
+    .videoStage{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .videoWrap{
+      width: min(420px, 92vw);
+      max-height: 70svh;
+      max-height: 70dvh;
+      aspect-ratio: 9 / 16;
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      position: relative;
+    }
+
+    .videoWrap iframe{
+      width:100%;
+      height:100%;
+      display:block;
+      border:0;
+      background:#000;
+    }
+
+    .videoPlaceholder{
+      width:100%;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:16px;
+      color: rgba(232,237,245,.74);
+      font-size:13px;
+      text-align:center;
+      line-height:1.45;
+      background:
+        radial-gradient(400px 280px at 50% 35%, rgba(122,162,255,.12), transparent 65%),
+        rgba(0,0,0,.28);
+    }
+
+    .videoNote{
+      margin: 0;
+      font-size: 12px;
+      color: rgba(232,237,245,.74);
+      line-height: 1.35;
+      max-width: 52ch;
+      text-align:center;
+    }
+
+    .finalWrap{
+      width: min(560px, 92vw);
+      margin: 0 auto;
+      text-align:left;
+    }
+
+    .finalList{
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .revealLine{
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 520ms ease, transform 520ms ease;
+      margin:0;
+      font-size: clamp(16px, 4.2vw, 20px);
+      line-height: 1.48;
+      color: rgba(232,237,245,.95);
+      text-wrap: pretty;
+    }
+
+    .revealLine.show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .revealLine.dimmed{
+      opacity: .38;
+    }
+
+    .finalQ{
+      font-weight: 900;
+      font-size: clamp(18px, 4.8vw, 22px);
+      letter-spacing: .2px;
+    }
+
+    .endDim{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,0);
+      transition: background 900ms ease;
+      pointer-events:none;
+    }
+
+    .endDim.on{
+      background: rgba(0,0,0,.26);
+    }
+
+    .fadeIn{
+      animation: fadeIn 240ms ease both;
+    }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.42);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding: 14px;
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+    .overlay.show{ display:flex; }
+
+    .sheet{
+      width: min(520px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(12,16,22,.92);
+      padding: 14px;
+      box-shadow: 0 22px 70px rgba(0,0,0,.45);
+    }
+
+    .sheetTitle{
+      margin: 0 0 10px 0;
+      font-size: 13px;
+      color: rgba(232,237,245,.80);
+      letter-spacing:.2px;
+    }
+
+    .sheetRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .sheetBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 780;
+      font-size: 13px;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .18s ease, border-color .18s ease, transform .05s ease;
+    }
+    .sheetBtn:hover{ background: rgba(255,255,255,.10); }
+    .sheetBtn:active{ transform: translateY(1px); }
+    .sheetBtn.active{
+      border-color: rgba(122,162,255,.55);
+      background: rgba(122,162,255,.12);
+    }
+  </style>
 </head>
 
 <body>
+  <div class="stage">
+    <div class="bg"></div>
+    <div class="bgImg" id="bgImg"></div>
+    <div class="shade" id="shade"></div>
+    <div class="endDim" id="endDim" aria-hidden="true"></div>
 
-<div class="stage">
+    <div class="safe">
+      <div class="panel">
 
-  <!-- SCENE 1 -->
-  <div class="scene active" id="scene1">
-    <h2>Continuar</h2>
-    <button onclick="goToVideo()">Ir al video</button>
-  </div>
+        <div class="topbar">
+          <div class="leftControls">
+            <button class="iconBtn" id="backBtn" aria-label="Atrás" title="Atrás" style="visibility:hidden;">←</button>
+          </div>
 
-  <!-- SCENE VIDEO -->
-  <div class="scene" id="sceneVideo">
-    <div class="videoWrap" id="videoWrap">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%">
-        Cargando video...
+          <p class="kickerTop" id="topKicker"> </p>
+
+          <div class="rightControls">
+            <button class="iconBtn" id="toneBtn" aria-label="Cambiar tono" title="Tono" style="visibility:hidden;">Aa</button>
+          </div>
+        </div>
+
+        <!-- SCENE 0 PASSWORD -->
+        <section class="scene" id="scene0" aria-label="Ingresar contraseña">
+          <div class="content fadeIn">
+            <div class="authWrap">
+              <h1 class="title">Para continuar esta experiencia, ingresa la Contraseña:</h1>
+
+              <div class="authCard">
+                <label class="authLabel" for="passwordInput">Contraseña</label>
+                <input
+                  id="passwordInput"
+                  class="authInput"
+                  type="password"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  placeholder="Ingresa la contraseña"
+                />
+                <p class="authError" id="passwordError"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint">Puedes intentarlo las veces que quieras.</span>
+            <button class="btn primary" id="btnUnlock">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 1 -->
+        <section class="scene" id="scene1" aria-label="Elegir tono">
+          <div class="content fadeIn">
+            <h1 class="title">Elegí el tono</h1>
+            <p class="sub muted">La historia es la misma.<br/>Cambia la forma en que la digo.</p>
+
+            <div class="tones" id="tones" role="tablist" aria-label="Selección de tono">
+              <button class="tone-btn" data-tone="claro" role="tab" aria-selected="false">Claro</button>
+              <button class="tone-btn" data-tone="calido" role="tab" aria-selected="false">Cálido</button>
+              <button class="tone-btn" data-tone="poetico" role="tab" aria-selected="false">Poético</button>
+            </div>
+
+            <div class="preview" aria-label="Vista previa del tono">
+              <p class="previewTitle">Así va a sonar</p>
+              <div class="bubble fadeSwap" id="previewText"></div>
+              <div class="chosen" id="chosenLine"><span>Elegiste:</span> Claro</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnToLoad">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE LOAD -->
+        <section class="scene" id="sceneLoad" aria-label="Inicializando experiencia">
+          <div class="content fadeIn">
+            <div class="loadingWrap">
+              <h1 class="title">Preparando la experiencia</h1>
+              <p class="sub muted">Simulación de carga con criterios de supervivencia UX.</p>
+
+              <div class="loadingCard">
+                <div class="loadingHead">
+                  <p class="loadingLabel">Estado del sistema</p>
+                  <p class="loadingPercent" id="loadingPercent">0%</p>
+                </div>
+
+                <div class="progress" aria-label="Barra de progreso">
+                  <div class="progressBar" id="progressBar"></div>
+                </div>
+
+                <p class="loadingState" id="loadingState">Inicializando…</p>
+              </div>
+
+              <p class="loadingHint">No está cargando nada. Solo está siendo dramáticamente correcta.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCENE 2 -->
+        <section class="scene" id="scene2" aria-label="Decisión">
+          <div class="content fadeIn centerNudge">
+            <div class="statement">Esto no es una sorpresa.<br>Es una decisión.</div>
+            <div class="statementSub" id="scene2Sub">Sin apuro. Sin ambigüedad.</div>
+            <div class="divider"></div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo3">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 3 -->
+        <section class="scene" id="scene3" aria-label="Un paso real">
+          <div class="content fadeIn">
+            <h1 class="title">Un paso real</h1>
+
+            <div class="glass">
+              <p class="kickerIn" id="scene3Kicker">Yo di el paso</p>
+              <div class="lines" id="scene3Lines"></div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo4">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 4 -->
+        <section class="scene" id="scene4" aria-label="Paso concreto">
+          <div class="content fadeIn upperContent">
+            <div class="upperBlock">
+              <p class="upperText">Yo di el paso
+
+Salí de mi zona de confort
+
+Y elegí ir a verte</p>
+              <div class="upperDivider"></div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo5">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 5 -->
+        <section class="scene" id="scene5" aria-label="Video">
+          <div class="content fadeIn videoStage">
+            <div class="videoWrap" id="videoWrap">
+              <div class="videoPlaceholder">
+                Preparando video…
+              </div>
+            </div>
+            <p class="videoNote">El video se carga recién al entrar a esta pantalla.</p>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo6">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 6 -->
+        <section class="scene" id="scene6" aria-label="Nos encontramos">
+          <div class="content fadeIn upperContent">
+            <div class="upperBlock">
+              <p class="upperText">Nos encontramos.
+
+Nos gustamos.
+
+Rezamos juntos.
+
+Nos besamos.
+
+Descubrimos que queremos estar juntos.</p>
+              <div class="upperDivider"></div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo7">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 7 -->
+        <section class="scene" id="scene7" aria-label="Nos seguimos eligiendo">
+          <div class="content fadeIn upperContent">
+            <div class="upperBlock">
+              <p class="upperText">Seguimos hablando.
+
+Nos seguimos eligiendo.
+
+Y nos volvimos a encontrar.</p>
+              <div class="upperDivider"></div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <span class="hint"></span>
+            <button class="btn primary" id="btnTo8">Continuar</button>
+          </div>
+        </section>
+
+        <!-- SCENE 8 -->
+        <section class="scene" id="scene8" aria-label="Final">
+          <div class="content fadeIn">
+            <div class="finalWrap">
+              <div class="finalList" id="finalList"></div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
 
-    <button onclick="back()">Volver</button>
+    <div class="overlay" id="toneOverlay" aria-hidden="true">
+      <div class="sheet" role="dialog" aria-label="Cambiar tono">
+        <p class="sheetTitle">Cambiar tono</p>
+        <div class="sheetRow" id="sheetRow"></div>
+      </div>
+    </div>
   </div>
 
-</div>
+  <script>
+    const ACCESS_PASSWORD = "MAURILU";
+    const SHORT_NAME = "Lu";
+    const DEFAULT_TONE = "claro";
+    const YT_VIDEO_ID = "WuGrrLOx5zY";
 
-<script>
-const videoId = "1175649210";
-const videoWrap = document.getElementById("videoWrap");
+    const toneLabel = {
+      claro: "Claro",
+      calido: "Cálido",
+      poetico: "Poético"
+    };
 
-function mountVideo(){
-  if(videoWrap.querySelector("iframe")) return;
+    const previews = {
+      claro:   `Hola, ${SHORT_NAME}.\nEsto no es una sorpresa. Es una decisión.`,
+      calido:  `Hola, ${SHORT_NAME}.\nEsto no es solo una sorpresa.\nEs una decisión que fui tomando con el tiempo.`,
+      poetico: `Hola, ${SHORT_NAME}.\nEsto no nació de un momento.\nNació de una decisión.`
+    };
 
-  videoWrap.innerHTML = `
-    <iframe
-      src="https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&playsinline=1&title=0&byline=0&portrait=0&dnt=1"
-      allow="autoplay; fullscreen; picture-in-picture"
-      allowfullscreen
-      referrerpolicy="strict-origin-when-cross-origin">
-    </iframe>
-  `;
-}
+    const scene2Sublines = {
+      claro:   "Sin apuro. Sin ambigüedad.",
+      calido:  "Con calma. Con intención.",
+      poetico: "Con calma. Con verdad."
+    };
 
-function unmountVideo(){
-  videoWrap.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:center;height:100%">
-      Cargando video...
-    </div>
-  `;
-}
+    const scene3LinesByTone = {
+      claro: [
+        "Me fui al sur buscando silencio y respuestas",
+        "Tratando de escuchar a Dios y encontrarme conmigo",
+        "",
+        "Pero alguien me salió al encuentro desde otro lado",
+        "No desde el sur, sino desde el norte"
+      ],
+      calido: [
+        "Me fui al sur buscando silencio y respuestas",
+        "Tratando de escuchar a Dios y encontrarme conmigo",
+        "",
+        "Pero alguien me salió al encuentro desde otro lado",
+        "No desde el sur, sino desde el norte"
+      ],
+      poetico: [
+        "Me fui al sur buscando silencio y respuestas",
+        "Tratando de escuchar a Dios y encontrarme conmigo",
+        "",
+        "Pero alguien me salió al encuentro desde otro lado",
+        "No desde el sur, sino desde el norte"
+      ]
+    };
 
-function goToVideo(){
-  document.getElementById("scene1").classList.remove("active");
-  document.getElementById("sceneVideo").classList.add("active");
-  mountVideo();
-}
+    const finalLines = [
+      "Elegimos decirnos siempre la verdad",
+      "Elegimos encontrarnos una vez por mes",
+      "Elegimos conocernos más",
+      "Nos elegimos.",
+      "¿Nos elegimos?"
+    ];
 
-function back(){
-  document.getElementById("sceneVideo").classList.remove("active");
-  document.getElementById("scene1").classList.add("active");
-  unmountVideo();
-}
-</script>
+    const BG = {
+      catedral: "catedral.jpg",
+      juntos: "juntos.jpg"
+    };
 
+    const REVEAL = {
+      initialDelay: 900,
+      interval: 1050,
+      pauseBeforeQ: 2200,
+      dimAfterQ: 1800
+    };
+
+    const loadingSteps = [
+      { text: "Inicializando interfaz candidata…", percent: 12 },
+      { text: "Buscando pixel perfect y sentido real…", percent: 39 },
+      { text: "Verificando que no haya CTA engañosos…", percent: 58 },
+      { text: "Confirmando que esto no es un dark pattern…", percent: 61 },
+      { text: "Confirmando ausencia de manipulación emocional…", percent: 73 },
+      { text: "Evitando sobrecarga de estímulos…", percent: 91 },
+      { text: "Release candidate estable..", percent: 100 }
+    ];
+
+    const bgImg = document.getElementById("bgImg");
+    const shade = document.getElementById("shade");
+    const endDim = document.getElementById("endDim");
+
+    const backBtn = document.getElementById("backBtn");
+    const toneBtn = document.getElementById("toneBtn");
+    const topKicker = document.getElementById("topKicker");
+
+    const previewEl = document.getElementById("previewText");
+    const chosenEl = document.getElementById("chosenLine");
+    const toneButtons = Array.from(document.querySelectorAll(".tone-btn"));
+
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordError = document.getElementById("passwordError");
+
+    const scene2Sub = document.getElementById("scene2Sub");
+    const scene3LinesBox = document.getElementById("scene3Lines");
+
+    const progressBar = document.getElementById("progressBar");
+    const loadingPercent = document.getElementById("loadingPercent");
+    const loadingState = document.getElementById("loadingState");
+
+    const videoWrap = document.getElementById("videoWrap");
+    const finalList = document.getElementById("finalList");
+
+    const toneOverlay = document.getElementById("toneOverlay");
+    const sheetRow = document.getElementById("sheetRow");
+
+    const scenes = [
+      "scene0",
+      "scene1",
+      "sceneLoad",
+      "scene2",
+      "scene3",
+      "scene4",
+      "scene5",
+      "scene6",
+      "scene7",
+      "scene8"
+    ];
+
+    let current = 0;
+    let finalTimers = [];
+    let loadingTimers = [];
+
+    function setBackground(img){
+      if(!img){
+        bgImg.style.display = "none";
+        shade.style.display = "none";
+        bgImg.style.backgroundImage = "";
+        return;
+      }
+      bgImg.style.display = "block";
+      shade.style.display = "block";
+      bgImg.style.backgroundImage = `url("${img}")`;
+    }
+
+    function setTopControlsForScene(sceneId){
+      const showBack = !["scene0", "scene1", "sceneLoad", "scene8"].includes(sceneId);
+      backBtn.style.visibility = showBack ? "visible" : "hidden";
+
+      const showTone = ["scene2", "scene3", "scene4"].includes(sceneId);
+      toneBtn.style.visibility = showTone ? "visible" : "hidden";
+    }
+
+    function setTopKicker(sceneId){
+      switch(sceneId){
+        case "scene0": topKicker.textContent = " "; break;
+        case "scene1": topKicker.textContent = "Antes de seguir…"; break;
+        default: topKicker.textContent = " ";
+      }
+    }
+
+    function applyToneToScenes(tone){
+      scene2Sub.textContent = scene2Sublines[tone] || scene2Sublines[DEFAULT_TONE];
+
+      const lines = scene3LinesByTone[tone] || scene3LinesByTone[DEFAULT_TONE];
+      scene3LinesBox.innerHTML = "";
+
+      lines.forEach(t=>{
+        if(t === ""){
+          const spacer = document.createElement("div");
+          spacer.style.height = "10px";
+          scene3LinesBox.appendChild(spacer);
+          return;
+        }
+        const p = document.createElement("p");
+        p.className = "line";
+        p.textContent = t;
+        scene3LinesBox.appendChild(p);
+      });
+
+      Array.from(sheetRow.querySelectorAll(".sheetBtn")).forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.tone === tone);
+      });
+    }
+
+    function setTone(tone){
+      toneButtons.forEach(btn=>{
+        const isActive = btn.dataset.tone === tone;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-selected", String(isActive));
+      });
+
+      previewEl.classList.add("fading");
+      setTimeout(()=>{
+        previewEl.textContent = previews[tone] || previews[DEFAULT_TONE];
+        chosenEl.innerHTML = `<span>Elegiste:</span> ${toneLabel[tone] || toneLabel[DEFAULT_TONE]}`;
+        previewEl.classList.remove("fading");
+      }, 140);
+
+      localStorage.setItem("tone", tone);
+      applyToneToScenes(tone);
+    }
+
+    function clearLoadingTimers(){
+      loadingTimers.forEach(t => clearTimeout(t));
+      loadingTimers = [];
+    }
+
+    function resetLoadingUI(){
+      progressBar.style.width = "0%";
+      loadingPercent.textContent = "0%";
+      loadingState.textContent = "Inicializando…";
+      loadingState.classList.remove("updating");
+    }
+
+    function startFakeLoading(){
+      clearLoadingTimers();
+      resetLoadingUI();
+
+      let accumulated = 450;
+
+      loadingSteps.forEach((step, index) => {
+        loadingTimers.push(setTimeout(() => {
+          loadingState.classList.add("updating");
+
+          setTimeout(() => {
+            loadingState.textContent = `${step.text} ${step.percent}%`;
+            loadingPercent.textContent = `${step.percent}%`;
+            progressBar.style.width = `${step.percent}%`;
+            loadingState.classList.remove("updating");
+          }, 180);
+        }, accumulated));
+
+        accumulated += (index === loadingSteps.length - 1) ? 1800 : 1640;
+      });
+
+      loadingTimers.push(setTimeout(() => {
+        showScene(3);
+      }, accumulated + 500));
+    }
+
+    function clearFinalTimers(){
+      finalTimers.forEach(t=> clearTimeout(t));
+      finalTimers = [];
+    }
+
+    function renderFinalReveal(){
+      clearFinalTimers();
+
+      finalList.innerHTML = "";
+      finalLines.forEach((t,i)=>{
+        const p = document.createElement("p");
+        p.className = "revealLine";
+        if(i === finalLines.length - 1) p.classList.add("finalQ");
+        p.textContent = t;
+        finalList.appendChild(p);
+      });
+
+      const nodes = Array.from(finalList.querySelectorAll(".revealLine"));
+      const t0 = REVEAL.initialDelay;
+      const interval = REVEAL.interval;
+
+      for(let i=0;i<4;i++){
+        finalTimers.push(setTimeout(()=> nodes[i].classList.add("show"), t0 + i*interval));
+      }
+
+      const qIndex = 4;
+      const qTime = t0 + 3*interval + REVEAL.pauseBeforeQ;
+      finalTimers.push(setTimeout(()=>{
+        nodes[qIndex].classList.add("show");
+
+        finalTimers.push(setTimeout(()=>{
+          for(let i=0;i<4;i++) nodes[i].classList.add("dimmed");
+          endDim.classList.add("on");
+        }, REVEAL.dimAfterQ));
+      }, qTime));
+    }
+
+    function mountVideo(){
+      if(!videoWrap) return;
+      if(videoWrap.querySelector("iframe")) return;
+
+      videoWrap.innerHTML = `
+        <iframe
+          src="https://www.youtube.com/embed/${YT_VIDEO_ID}?autoplay=1&mute=1&controls=1&loop=1&playlist=${YT_VIDEO_ID}&playsinline=1&rel=0&modestbranding=1"
+          title="Video"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+      `;
+    }
+
+    function unmountVideo(){
+      if(!videoWrap) return;
+      videoWrap.innerHTML = `
+        <div class="videoPlaceholder">
+          Preparando video…
+        </div>
+      `;
+    }
+
+    function showScene(index){
+      clearLoadingTimers();
+      current = index;
+
+      const sceneId = scenes[index];
+
+      if(sceneId !== "scene5"){
+        unmountVideo();
+      }
+
+      scenes.forEach((id,i)=>{
+        const el = document.getElementById(id);
+        el.classList.toggle("active", i === index);
+      });
+
+      setTopControlsForScene(sceneId);
+      setTopKicker(sceneId);
+      endDim.classList.remove("on");
+
+      const tone = localStorage.getItem("tone") || DEFAULT_TONE;
+      applyToneToScenes(tone);
+
+      if(sceneId === "scene3" || sceneId === "scene4"){
+        setBackground(BG.catedral);
+      }else if(sceneId === "scene6" || sceneId === "scene7"){
+        setBackground(BG.juntos);
+      }else{
+        setBackground(null);
+      }
+
+      if(sceneId === "scene5"){
+        mountVideo();
+      }
+
+      if(sceneId === "scene8"){
+        renderFinalReveal();
+      }
+
+      if(sceneId === "sceneLoad"){
+        startFakeLoading();
+      }
+
+      if(sceneId === "scene0"){
+        setTimeout(() => passwordInput.focus(), 120);
+      }
+    }
+
+    function goBack(){
+      if(current <= 0) return;
+      if(scenes[current] === "sceneLoad") return;
+      showScene(current - 1);
+    }
+
+    function openToneOverlay(){
+      toneOverlay.classList.add("show");
+      toneOverlay.setAttribute("aria-hidden","false");
+    }
+
+    function closeToneOverlay(){
+      toneOverlay.classList.remove("show");
+      toneOverlay.setAttribute("aria-hidden","true");
+    }
+
+    function buildToneSheet(){
+      sheetRow.innerHTML = "";
+      ["claro","calido","poetico"].forEach(t=>{
+        const b = document.createElement("button");
+        b.className = "sheetBtn";
+        b.dataset.tone = t;
+        b.textContent = toneLabel[t];
+        b.addEventListener("click", ()=>{
+          setTone(t);
+          closeToneOverlay();
+        });
+        sheetRow.appendChild(b);
+      });
+    }
+
+    function tryUnlock(){
+      const value = passwordInput.value.trim().toUpperCase();
+
+      if(value === ACCESS_PASSWORD){
+        passwordError.textContent = "";
+        passwordInput.value = "";
+        showScene(1);
+        return;
+      }
+
+      passwordError.textContent = "Contraseña incorrecta. Puedes volver a intentarlo.";
+      passwordInput.focus();
+      passwordInput.select();
+    }
+
+    toneOverlay.addEventListener("click", (e)=>{
+      if(e.target === toneOverlay) closeToneOverlay();
+    });
+
+    document.getElementById("tones").addEventListener("click", (e)=>{
+      const btn = e.target.closest(".tone-btn");
+      if(!btn) return;
+      setTone(btn.dataset.tone);
+    });
+
+    document.getElementById("btnUnlock").addEventListener("click", tryUnlock);
+
+    /* CORREGIDO: índices reales */
+    document.getElementById("btnToLoad").addEventListener("click", ()=> showScene(2)); // sceneLoad
+    document.getElementById("btnTo3").addEventListener("click", ()=> showScene(4));   // no se usa porque scene2 llega desde loading
+    document.getElementById("btnTo4").addEventListener("click", ()=> showScene(5));
+    document.getElementById("btnTo5").addEventListener("click", ()=> showScene(6));
+    document.getElementById("btnTo6").addEventListener("click", ()=> showScene(7));
+    document.getElementById("btnTo7").addEventListener("click", ()=> showScene(8));
+    document.getElementById("btnTo8").addEventListener("click", ()=> showScene(9));
+
+    backBtn.addEventListener("click", goBack);
+    toneBtn.addEventListener("click", openToneOverlay);
+
+    passwordInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        tryUnlock();
+      }
+    });
+
+    passwordInput.addEventListener("input", ()=>{
+      if(passwordError.textContent){
+        passwordError.textContent = "";
+      }
+    });
+
+    buildToneSheet();
+
+    const savedTone = localStorage.getItem("tone") || DEFAULT_TONE;
+    setTone(savedTone);
+    showScene(0);
+  </script>
 </body>
 </html>
